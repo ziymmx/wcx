@@ -1,3 +1,11 @@
 /target/
 build/
 .gradle/
+
+# Signing keys — never commit these. The real keystore lives outside the repo
+# at ~/wcx-keystore.jks (auto-detected by app/build.gradle.kts), and CI reads
+# it from repo secrets.
+*.jks
+*.keystore
+*.p12
+KEYSTORE_BASE64.txt
