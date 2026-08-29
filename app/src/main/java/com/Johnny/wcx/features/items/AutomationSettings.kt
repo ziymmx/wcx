@@ -386,6 +386,7 @@ internal fun automationKeywordSummary(rule: AutomationKeywordRule, unrestrictedT
     if (!rule.enabled) return unrestrictedText
     return when (rule.mode) {
         AutomationKeywordMode.STRING_LIST -> "匹配字符串列表中的任意一项 (${rule.strings.size})"
+        AutomationKeywordMode.EXACT -> "完全等于字符串列表中的某一项 (${rule.strings.size})"
         AutomationKeywordMode.REGEX -> if (rule.regex.isBlank()) "尚未填写正则表达式" else "匹配单个正则表达式"
     }
 }
