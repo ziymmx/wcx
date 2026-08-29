@@ -68,6 +68,7 @@ internal data class AutomationTimeRangeRule(
 @Serializable
 internal enum class AutomationKeywordMode {
     STRING_LIST,
+    EXACT,
     REGEX
 }
 
@@ -76,19 +77,23 @@ internal data class AutomationKeywordRule(
     val enabled: Boolean = false,
     val mode: AutomationKeywordMode = AutomationKeywordMode.STRING_LIST,
     val strings: List<String> = emptyList(),
-    val regex: String = ""
+    val regex: String = "",
+    val ignoreCase: Boolean = false
 ) {
     fun matches(text: String): Boolean {
         if (!enabled) return true
+        val keywords = strings
+            .asSequence()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .toList()
         return when (mode) {
-            AutomationKeywordMode.STRING_LIST -> strings
-                .asSequence()
-                .map(String::trim)
-                .filter(String::isNotEmpty)
-                .any { text.contains(it) }
+            AutomationKeywordMode.STRING_LIST -> keywords.any { text.contains(it, ignoreCase) }
+            AutomationKeywordMode.EXACT -> keywords.any { text.equals(it, ignoreCase) }
 
             AutomationKeywordMode.REGEX -> runCatching {
-                Regex(regex).containsMatchIn(text)
+                Regex(regex, if (ignoreCase) setOf(RegexOption.IGNORE_CASE) else emptySet())
+                    .containsMatchIn(text)
             }.getOrDefault(false)
         }
     }
@@ -96,7 +101,7 @@ internal data class AutomationKeywordRule(
     fun validationError(label: String): String? {
         if (!enabled) return null
         return when (mode) {
-            AutomationKeywordMode.STRING_LIST ->
+            AutomationKeywordMode.STRING_LIST, AutomationKeywordMode.EXACT ->
                 if (strings.none(String::isNotBlank)) "${label}字符串列表不能为空" else null
 
             AutomationKeywordMode.REGEX -> when {
