@@ -53,20 +53,8 @@ data class OperationProto(
     @ProtoNumber(2) val opBuf: OpBufProto,
 )
 
-/** `xm5` – length-prefixed buffer holding a command payload's protobuf bytes. */
-@Serializable
-data class OpBufProto(
-    @ProtoNumber(1) val length: Int,
-    @ProtoNumber(2) val buf: ByteArray,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is OpBufProto) return false
-        return length == other.length && buf.contentEquals(other.buf)
-    }
-
-    override fun hashCode(): Int = 31 * length + buf.contentHashCode()
-}
+// OpBufProto 是 SKBuiltinProto.kt 里的 typealias (指向 SKBuiltinBufferProto)，
+// 此处不再重复定义为 data class，否则同包内同名冲突。
 
 /** `ym5` – a username wrapper reused across many command payloads. */
 @Serializable
