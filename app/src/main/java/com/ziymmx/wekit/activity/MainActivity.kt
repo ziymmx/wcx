@@ -610,17 +610,10 @@ class MainActivity : ComponentActivity() {
                 )
 
                 LinkCard(
-                    icon = MaterialSymbols.Outlined.Chat,
-                    title = "交流群组",
-                    subtitle = "https://t.me/wcx12138",
-                    onClick = { onUrlClick("https://t.me/wcx12138") }
-                )
-
-                LinkCard(
                     icon = GitHubIcon,
                     title = "GitHub",
-                    subtitle = "Johnny520/wcx",
-                    onClick = { onUrlClick("https://github.com/Johnny520/wcx") }
+                    subtitle = "ziymmx/wcx",
+                    onClick = { onUrlClick("https://github.com/ziymmx/wcx") }
                 )
             }
 
@@ -634,7 +627,8 @@ class MainActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("版本: ${BuildConfig.VERSION_NAME}")
                             Text("版本号: ${BuildConfig.VERSION_CODE}")
-                            Text("作者：Johnny520@github")
+                            Text("作者：ziymmx@github")
+                            Text("上游：Ujhhgtg/WeKit")
                         }
                     },
                     confirmButton = {
