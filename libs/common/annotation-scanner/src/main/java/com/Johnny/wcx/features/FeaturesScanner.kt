@@ -61,7 +61,7 @@ class FeaturesScanner(
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() }
             .toSet()
-            .also { logger.info("Feature whitelist: ${it.size} entries from ${file.name}") }
+            .also { logger.warn("Feature whitelist: ${it.size} entries loaded from ${file.name}") }
     }
 
     @OptIn(KspExperimental::class)
@@ -76,11 +76,23 @@ class FeaturesScanner(
 
         val allowed = whitelist
         val symbols = if (allowed == null) {
+            logger.warn("Feature whitelist: not configured, emitting all @Feature classes")
             allSymbols
         } else {
             allSymbols.filter { it.simpleName.asString() in allowed }.also {
-                logger.info("Feature whitelist: kept ${it.size}, dropped ${allSymbols.size - it.size}")
+                logger.warn("Feature whitelist: kept ${it.size}, dropped ${allSymbols.size - it.size}")
             }
+        }
+
+        // A whitelist that matches nothing almost always means a typo or the wrong
+        // kind of name (class simple name vs. the Chinese `name` argument). Fail
+        // loudly rather than silently producing an empty feature list.
+        if (allowed != null && allSymbols.isNotEmpty() && symbols.isEmpty()) {
+            logger.error(
+                "Feature whitelist matched none of the ${allSymbols.size} @Feature classes. " +
+                    "Entries must be Kotlin class simple names (e.g. 'AntiMessageRecall'), " +
+                    "not the Chinese `name` argument of @Feature.",
+            )
         }
 
         if (symbols.isEmpty()) return emptyList()

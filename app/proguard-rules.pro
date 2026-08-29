@@ -6,8 +6,29 @@
 -keep class com.Johnny.wcx.application.** { *; }
 
 # ─── Feature / Hook Classes ─────────────────────────────────────────
-# Keep class structure (for reflection/Xposed callback) but allow obfuscation
--keep class com.Johnny.wcx.features.** { *; }
+# 原先这里是一条 -keep class com.Johnny.wcx.features.** { *; }
+# 它会无条件保留 features 包下全部 343 个功能, 使 R8 无法裁剪,
+# 功能白名单 (features.whitelist) 因此完全失效。
+#
+# 改为只保留基类与白名单内的功能。白名单外的功能虽然仍会被编译,
+# 但不会进入 FeaturesProvider.ALL_HOOK_ITEMS, 成为不可达代码后被 R8 移除。
+#
+# 注意: 下面的列表必须与仓库根目录的 features.whitelist 保持一致,
+# 否则新增功能会被混淆或裁掉。
+-keep class com.Johnny.wcx.features.core.** { *; }
+
+-keep class com.Johnny.wcx.features.items.chat.AntiMessageRecall { *; }
+-keep class com.Johnny.wcx.features.items.system.PreventXposedDetection { *; }
+-keep class com.Johnny.wcx.features.items.system.SpoofEnvironment { *; }
+-keep class com.Johnny.wcx.features.items.system.HideModuleFromAppList { *; }
+-keep class com.Johnny.wcx.features.items.system.DisableHostHotUpdates { *; }
+-keep class com.Johnny.wcx.features.items.system.ForceTabletMode { *; }
+
+-keep class com.Johnny.wcx.features.api.core.WeXmlParserApi { *; }
+-keep class com.Johnny.wcx.features.api.core.WeDatabaseApi { *; }
+-keep class com.Johnny.wcx.features.api.core.WeMessageApi { *; }
+-keep class com.Johnny.wcx.features.api.net.WeNetSceneApi { *; }
+
 -keep,allowobfuscation class com.Johnny.wcx.hooks.** { *; }
 -keep,allowobfuscation class com.Johnny.wcx.datas.** { *; }
 

@@ -59,6 +59,12 @@ restores the full upstream feature set.
   and `WeMessageApi` in turn needs `WeNetSceneApi`.
 - Deleting feature files is NOT the way to trim this project — the API layer has
   dense cross-dependencies. Filter instead.
+- **`app/proguard-rules.pro` must stay in sync with the whitelist.** Upstream had a
+  blanket `-keep class com.Johnny.wcx.features.** { *; }` which keeps every feature
+  class regardless of reachability, so R8 stripped nothing and the whitelist had no
+  effect on APK size. The rule is now an explicit per-class list; when you add a
+  feature to `features.whitelist`, add a matching `-keep` line or it may be
+  obfuscated/shrunk away.
 - `SwitchFeature.defaultEnabled` is `true` in this fork: every whitelisted feature is
   on at startup with no in-WeChat settings entry, so there is no UI to toggle them.
   The standalone module app (`MainActivity`) still lists them if you need a manual override.
