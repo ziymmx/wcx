@@ -4,18 +4,16 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- 与 ic_launcher_foreground 同形，主题图标只取 alpha -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M53,32H69A7,7 0,0 1,76,39V46A7,7 0,0 1,69,53H53A7,7 0,0 1,46,46V39A7,7 0,0 1,53,32Z" />
+        android:pathData="M56,26H72A10,10 0,0 1,82,36V44A10,10 0,0 1,72,54H56A10,10 0,0 1,46,44V36A10,10 0,0 1,56,26Z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M67,33L74,27L75,35Z" />
+        android:pathData="M66,29L72,24L74,31Z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M39,46H63A9,9 0,0 1,72,55V64A9,9 0,0 1,63,73H39A9,9 0,0 1,30,64V55A9,9 0,0 1,39,46Z" />
+        android:pathData="M40,44H62A12,12 0,0 1,74,56V64A12,12 0,0 1,62,76H40A12,12 0,0 1,28,64V56A12,12 0,0 1,40,44Z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M37,71L33,82L47,74Z" />
+        android:pathData="M38,73L33,82L45,77Z" />
 </vector>

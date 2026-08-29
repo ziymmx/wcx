@@ -15,6 +15,7 @@ SpoofEnvironment          # 环境伪装
 HideModuleFromAppList     # 隐藏模块应用
 DisableHostHotUpdates     # 禁用微信热更新
 ForceTabletMode           # 强制平板模式
+ResetDexCache            # 重置适配信息（调试：手动清缓存触发重新适配，不属于 IResolveDex）
 
 # ── Shared API services (required by AntiMessageRecall) ───────────────────
 WeXmlParserApi            # intercepts the revoke sysmsg

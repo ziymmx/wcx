@@ -23,6 +23,7 @@
 -keep class com.ziymmx.wekit.features.items.system.HideModuleFromAppList { *; }
 -keep class com.ziymmx.wekit.features.items.system.DisableHostHotUpdates { *; }
 -keep class com.ziymmx.wekit.features.items.system.ForceTabletMode { *; }
+-keep class com.ziymmx.wekit.features.items.debug.ResetDexCache { *; }
 
 -keep class com.ziymmx.wekit.features.api.core.WeXmlParserApi { *; }
 -keep class com.ziymmx.wekit.features.api.core.WeDatabaseApi { *; }
