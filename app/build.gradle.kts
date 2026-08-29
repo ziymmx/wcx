@@ -44,8 +44,10 @@ android {
         applicationId = libs.versions.namespace.get()
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 247
-        versionName = "v247"
+        // Overridable so CI can keep bumping the version (Android refuses to
+        // install a build whose versionCode went backwards).
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 247
+        versionName = project.findProperty("versionName") as String? ?: "v247"
 
         buildConfigField("String", "COMMIT_HASH", "\"${gitHash}\"")
         buildConfigField("String", "TAG", "\"WCX\"")
@@ -57,7 +59,7 @@ android {
         abi {
             reset()
             isEnable = true
-            include("arm64-v8a", "armeabi-v7a")
+            include("arm64-v8a")
             isUniversalApk = false
         }
     }
@@ -258,6 +260,9 @@ ksp {
     // Room schema export for migration diffing
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.generateKotlin", "true")
+    // Trim the module down to the features listed in this file. Remove the arg
+    // (or the file) to build every @Feature again.
+    arg("wekit.feature.whitelist", rootProject.file("features.whitelist").absolutePath)
 }
 
 dependencies {

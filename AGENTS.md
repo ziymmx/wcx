@@ -8,8 +8,11 @@
 # (./x is alias to `cargo xtask` which orchestrates the build process)
 ```
 
-- JDK 21
+- JDK 17 (from `gradle/libs.versions.toml`; the wrapper is Gradle 9.6.1, AGP 9.3.0)
 - Rust native lib auto-compiles during build (targets: `app/src/main/rust/wekit-native`). Requires:
+  Note: the CI workflow does **not** build it — `app/src/main/jniLibs/arm64-v8a/libwekit_native.so`
+  is committed, so CI skips the whole Rust/NDK setup. Only re-run `cargo xtask build --native-only`
+  if you change Rust sources.
   Rust toolchain + Android NDK targets + NDK. `configureCargo` task auto-generates `.cargo/config.toml`
   from NDK.
 - AGP 9, Gradle version catalog in `gradle/libs.versions.toml`
@@ -19,8 +22,9 @@
 - `app/` — main Android module, entrypoints, hooks, UI, native Rust lib
 - `libs/common/annotation-scanner/` — KSP annotation processor (`@Feature` scanner)
 - `libs/common/libxposed-api/` — compileOnly LibXposed API interface stubs (compileOnly since they are provided by user's Xposed framework)
-- `libs/common/bsh/` — submodule: forked BeanShell interpreter with snapshot serialization (`BshSnapshot`, `BshSnapshotHelper`); snapshots are encrypted AST byte representations used by the WAuxiliary Xposed module; `app/src/main/java/dev/ujhhgtg/wekit/utils/BshSnapshotDecompiler.kt` — decompiles encrypted BeanShell snapshot files back into Java-like source code; the AES key was recovered from WAuxiliary's decompiled source
-- `libs/common/reflekt/` — submodule: reflection utility library (`com.Johnny.reflekt`)
+- `libs/common/bsh/` — git submodule (`Johnny520/bsh`): forked BeanShell interpreter with snapshot serialization (`BshSnapshot`, `BshSnapshotHelper`); snapshots are encrypted AST byte representations used by the WAuxiliary Xposed module; `app/src/main/java/dev/ujhhgtg/wekit/utils/BshSnapshotDecompiler.kt` — decompiles encrypted BeanShell snapshot files back into Java-like source code; the AES key was recovered from WAuxiliary's decompiled source
+- `libs/common/reflekt/` — git submodule (`Ujhhgtg/reflekt`): reflection utility library (`dev.ujhhgtg.reflekt`). **Required** — `SpoofEnvironment`, `HideModuleFromAppList`, `DisableHostHotUpdates` and `ForceTabletMode` all call `.reflekt()`
+- `features.whitelist` — **build-time feature filter** (repo root). See "Feature Whitelist" below
 - `libs/common/stubs/` — compileOnly stubs for WeChat and Android hidden classes
 - `buildSrc/` — custom Gradle tasks: `GenerateMethodHashesTask` (`IResolveDex` `resolveDex` method MD5 cache), `ConfigureCargoTask` (Rust NDK linker config)
 
@@ -33,6 +37,29 @@
 - DEX analysis via DexKit with `IResolveDex` interface; method resolve body MD5-hashed for cache (
   `GenerateMethodHashesTask`)
 - DEX-resolved targets DSL: `val methodTarget by dexMethod()` `val classTarget by dexClass()` delegate → `methodTarget.hookBefore { ... }`, `val method: Method = methodTarget.method`, `val clazz = classTarget.clazz`
+
+## Feature Whitelist
+
+This fork builds a small curated feature set. `features.whitelist` (repo root) lists the
+Kotlin **class simple names** to keep, one per line (`#` starts a comment). It is passed to
+the KSP processor via `arg("wekit.feature.whitelist", ...)` in `app/build.gradle.kts`.
+
+How it works: `FeaturesScanner` filters the `@Feature` symbols before emitting
+`FeaturesProvider.ALL_HOOK_ITEMS`. Excluded features are still compiled but become
+unreachable, so R8 strips them from the APK. Removing the `arg(...)` (or the file)
+restores the full upstream feature set.
+
+**Rules:**
+- Match on class simple name, not the Chinese `name` argument (names can collide).
+- Features under `features/api/` are shared services and are **not** auto-included.
+  Adding an item feature that depends on one requires listing that service too —
+  e.g. `AntiMessageRecall` needs `WeXmlParserApi`, `WeDatabaseApi`, `WeMessageApi`,
+  and `WeMessageApi` in turn needs `WeNetSceneApi`.
+- Deleting feature files is NOT the way to trim this project — the API layer has
+  dense cross-dependencies. Filter instead.
+- `SwitchFeature.defaultEnabled` is `true` in this fork: every whitelisted feature is
+  on at startup with no in-WeChat settings entry, so there is no UI to toggle them.
+  The standalone module app (`MainActivity`) still lists them if you need a manual override.
 - UI: Jetpack Compose + Material 3, dialogs written using `showComposeDialog` and `AlertDialogContent`
 - Config: MMKV via `WePrefs`
 - Logging: via `WeLogger`

@@ -7,8 +7,13 @@ import com.Johnny.wcx.utils.WeLogger
 
 abstract class SwitchFeature : BaseFeature() {
 
-    /** Default state when the user has never toggled this feature. */
-    protected open val defaultEnabled: Boolean = false
+    /**
+     * Default state when the user has never toggled this feature.
+     *
+     * This build ships a fixed, curated feature set with no in-WeChat settings
+     * entry, so every feature on the whitelist is on out of the box.
+     */
+    protected open val defaultEnabled: Boolean = true
 
     /** Whether this feature should load in the current process. Defaults to the main process only. */
     protected open val shouldLoadInCurrentProcess: Boolean

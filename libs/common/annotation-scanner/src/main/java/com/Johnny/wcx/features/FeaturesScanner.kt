@@ -18,34 +18,70 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.writeTo
+import java.io.File
 
 private const val PACKAGE_NAME = "com.Johnny.wcx"
 private const val HOOKS_CORE_PACKAGE = "$PACKAGE_NAME.features.core"
 private const val BASE_HOOK_ITEM = "BaseFeature"
 
+/** KSP option key holding the absolute path of the feature whitelist file. */
+const val WHITELIST_OPTION = "wekit.feature.whitelist"
+
 class FeaturesKspProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return FeaturesScanner(environment.codeGenerator, environment.logger)
+        return FeaturesScanner(environment.codeGenerator, environment.logger, environment.options)
     }
 }
 
 class FeaturesScanner(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
+    private val options: Map<String, String>,
 ) : SymbolProcessor {
 
     // Guard against being called multiple times (KSP can call process() more than once)
     private var generated = false
+
+    /**
+     * Class simple names to keep, or null when no whitelist is configured
+     * (in which case every @Feature is emitted, preserving upstream behaviour).
+     */
+    private val whitelist: Set<String>? by lazy(::loadWhitelist)
+
+    private fun loadWhitelist(): Set<String>? {
+        val path = options[WHITELIST_OPTION]?.takeIf { it.isNotBlank() } ?: return null
+        val file = File(path)
+
+        if (!file.isFile) {
+            logger.error("Feature whitelist not found at: $path")
+            return null
+        }
+
+        return file.readLines()
+            .map { it.substringBefore('#').trim() }
+            .filter { it.isNotEmpty() }
+            .toSet()
+            .also { logger.info("Feature whitelist: ${it.size} entries from ${file.name}") }
+    }
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (generated) return emptyList()
         generated = true
 
-        val symbols = resolver
+        val allSymbols = resolver
             .getSymbolsWithAnnotation("$HOOKS_CORE_PACKAGE.Feature")
             .filterIsInstance<KSClassDeclaration>()
             .toList()
+
+        val allowed = whitelist
+        val symbols = if (allowed == null) {
+            allSymbols
+        } else {
+            allSymbols.filter { it.simpleName.asString() in allowed }.also {
+                logger.info("Feature whitelist: kept ${it.size}, dropped ${allSymbols.size - it.size}")
+            }
+        }
 
         if (symbols.isEmpty()) return emptyList()
 

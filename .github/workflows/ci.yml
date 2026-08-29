@@ -1,0 +1,127 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # reflekt + bsh are git submodules and are required to compile.
+          submodules: recursive
+
+      - name: Compute version
+        id: ver
+        run: |
+          # Monotonic per repository. Android refuses to install an APK whose
+          # versionCode went backwards, so this must never decrease.
+          CODE=$(( 1000 + GITHUB_RUN_NUMBER ))
+          echo "code=${CODE}" >> "$GITHUB_OUTPUT"
+          echo "name=v${CODE}" >> "$GITHUB_OUTPUT"
+          echo "Building ${CODE}"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          KS_FILE="$RUNNER_TEMP/wekit-keystore.jks"
+
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::KEYSTORE_BASE64 is not set. Without a stable keystore every build"
+            echo "::error::is signed differently and cannot update over the previous one."
+            echo "::error::Create one locally, then add these repo secrets:"
+            echo "::error::  keytool -genkeypair -v -keystore wekit.jks -storetype PKCS12 \\"
+            echo "::error::    -alias wcx -keyalg RSA -keysize 2048 -validity 10000"
+            echo "::error::  base64 -w0 wekit.jks   -> KEYSTORE_BASE64"
+            exit 1
+          fi
+
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KS_FILE"
+          SIZE=$(stat -c%s "$KS_FILE" 2>/dev/null || echo 0)
+          if [ "$SIZE" -lt 100 ]; then
+            echo "::error::Decoded keystore is only ${SIZE} bytes — base64 decode failed."
+            exit 1
+          fi
+
+          if ! keytool -list -keystore "$KS_FILE" -storepass "$STORE_PASSWORD" \
+               -alias "$KEY_ALIAS" > /dev/null 2>&1; then
+            echo "::error::Cannot open the keystore. Check KEYSTORE_BASE64 / KEYSTORE_PASSWORD / KEY_ALIAS."
+            exit 1
+          fi
+          echo "Keystore OK (${SIZE} bytes, alias=${KEY_ALIAS})"
+
+      - name: Build release APK
+        env:
+          WEKIT_KEYSTORE_FILE: ${{ runner.temp }}/wekit-keystore.jks
+          WEKIT_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          WEKIT_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          WEKIT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleStandardRelease --stacktrace \
+            -PversionCode=${{ steps.ver.outputs.code }} \
+            -PversionName=${{ steps.ver.outputs.name }}
+
+      - name: Collect APKs
+        run: |
+          mkdir -p dist
+          find app/build/outputs/apk -type f -name '*.apk' -exec cp -v {} dist/ \;
+          ls -lh dist/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wekit-${{ steps.ver.outputs.name }}
+          path: dist/*.apk
+
+      - name: Create GitHub release
+        if: github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.name }}
+          name: WeKit ${{ steps.ver.outputs.name }}
+          body: |
+            Automated build of `${{ github.sha }}`.
+
+            Bundled features (see `features.whitelist`):
+            - 防撤回
+            - 禁止微信检测 Xposed
+            - 环境伪装
+            - 隐藏模块应用
+            - 禁用微信热更新
+            - 强制平板模式
+
+            arm64-v8a only. Requires WeChat and an Xposed/LSPosed framework.
+          files: dist/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,23 @@
+# WeKit feature whitelist — consumed by FeaturesScanner (KSP) at build time.
+#
+# Only classes listed here are emitted into FeaturesProvider.ALL_HOOK_ITEMS.
+# Everything else is still compiled but becomes unreachable, so R8 strips it
+# from the final APK. Match on the Kotlin class simple name, one per line.
+# Lines starting with '#' are comments.
+#
+# When adding a feature back, check its transitive dependencies: features under
+# features/api/ are shared services and are NOT auto-included.
+
+# ── User-facing features ──────────────────────────────────────────────────
+AntiMessageRecall         # 防撤回
+PreventXposedDetection    # 禁止微信检测 Xposed
+SpoofEnvironment          # 环境伪装
+HideModuleFromAppList     # 隐藏模块应用
+DisableHostHotUpdates     # 禁用微信热更新
+ForceTabletMode           # 强制平板模式
+
+# ── Shared API services (required by AntiMessageRecall) ───────────────────
+WeXmlParserApi            # intercepts the revoke sysmsg
+WeDatabaseApi             # reads the original message content
+WeMessageApi              # inserts the recall notice
+WeNetSceneApi             # required by WeMessageApi

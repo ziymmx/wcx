@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
-        maven { url = uri("file:///root/maven-mirror") }
-                maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/")
+        maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/")
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -11,8 +11,8 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url = uri("file:///root/maven-mirror") }
-                maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/")
+        maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/")
+        google()
         maven("https://jitpack.io") {
             content {
                 includeGroup("com.github.Ujhhgtg")
