@@ -2,7 +2,7 @@ package me.hd.wauxv.data.bean
 
 import androidx.annotation.Keep
 import dev.ujhhgtg.reflekt.spec.typeMatches
-import com.Johnny.wcx.utils.reflection.int
+import com.ziymmx.wekit.utils.reflection.int
 
 @Keep
 class PayMsgBean(g2: Any) {

@@ -1,8 +1,8 @@
 package me.hd.wauxv.data.bean
 
 import androidx.annotation.Keep
-import com.Johnny.wcx.features.api.core.models.MessageInfo
-import com.Johnny.wcx.features.api.core.models.MessageType
+import com.ziymmx.wekit.features.api.core.models.MessageInfo
+import com.ziymmx.wekit.features.api.core.models.MessageType
 
 @Suppress("unused")
 @Keep

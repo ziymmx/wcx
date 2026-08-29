@@ -19,7 +19,7 @@ kotlin {
 }
 
 configure<LibraryExtension> {
-    namespace = "com.Johnny.wcx.stubs"
+    namespace = "com.ziymmx.wekit.stubs"
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()

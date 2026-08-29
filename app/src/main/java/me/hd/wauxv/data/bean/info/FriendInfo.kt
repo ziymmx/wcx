@@ -1,7 +1,7 @@
 package me.hd.wauxv.data.bean.info
 
 import androidx.annotation.Keep
-import com.Johnny.wcx.features.api.core.models.WeContact
+import com.ziymmx.wekit.features.api.core.models.WeContact
 
 @Keep
 data class FriendInfo(

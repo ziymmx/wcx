@@ -2,7 +2,7 @@ package me.hd.wauxv.data.bean
 
 import androidx.annotation.Keep
 import com.alibaba.fastjson2.JSONObject
-import com.Johnny.wcx.features.api.core.WeContactLabelApi
+import com.ziymmx.wekit.features.api.core.WeContactLabelApi
 
 @Suppress("unused")
 @Keep

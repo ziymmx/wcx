@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: build-${{ github.ref }}
@@ -101,30 +101,11 @@ jobs:
           find app/build/outputs/apk -type f -name '*.apk' -exec cp -v {} dist/ \;
           ls -lh dist/
 
+      # APKs are published as build artifacts only — no GitHub release is created.
+      # Grab them from the run's "Artifacts" section (retained for 90 days).
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: wekit-${{ steps.ver.outputs.name }}
           path: dist/*.apk
-
-      - name: Create GitHub release
-        if: github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.ver.outputs.name }}
-          name: WeKit ${{ steps.ver.outputs.name }}
-          body: |
-            Automated build of `${{ github.sha }}`.
-
-            Bundled features (see `features.whitelist`):
-            - 防撤回
-            - 禁止微信检测 Xposed
-            - 环境伪装
-            - 隐藏模块应用
-            - 禁用微信热更新
-            - 强制平板模式
-
-            arm64-v8a only. Requires WeChat and an Xposed/LSPosed framework.
-          files: dist/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          retention-days: 90

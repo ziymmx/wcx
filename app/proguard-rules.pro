@@ -2,11 +2,11 @@
 # These MUST be kept with original names — Xposed framework loads them
 -keep class de.robv.android.xposed.** { *; }
 -keep class io.github.libxposed.** { *; }
--keep class com.Johnny.wcx.entry.** { *; }
--keep class com.Johnny.wcx.application.** { *; }
+-keep class com.ziymmx.wekit.entry.** { *; }
+-keep class com.ziymmx.wekit.application.** { *; }
 
 # ─── Feature / Hook Classes ─────────────────────────────────────────
-# 原先这里是一条 -keep class com.Johnny.wcx.features.** { *; }
+# 原先这里是一条 -keep class com.ziymmx.wekit.features.** { *; }
 # 它会无条件保留 features 包下全部 343 个功能, 使 R8 无法裁剪,
 # 功能白名单 (features.whitelist) 因此完全失效。
 #
@@ -15,26 +15,26 @@
 #
 # 注意: 下面的列表必须与仓库根目录的 features.whitelist 保持一致,
 # 否则新增功能会被混淆或裁掉。
--keep class com.Johnny.wcx.features.core.** { *; }
+-keep class com.ziymmx.wekit.features.core.** { *; }
 
--keep class com.Johnny.wcx.features.items.chat.AntiMessageRecall { *; }
--keep class com.Johnny.wcx.features.items.system.PreventXposedDetection { *; }
--keep class com.Johnny.wcx.features.items.system.SpoofEnvironment { *; }
--keep class com.Johnny.wcx.features.items.system.HideModuleFromAppList { *; }
--keep class com.Johnny.wcx.features.items.system.DisableHostHotUpdates { *; }
--keep class com.Johnny.wcx.features.items.system.ForceTabletMode { *; }
+-keep class com.ziymmx.wekit.features.items.chat.AntiMessageRecall { *; }
+-keep class com.ziymmx.wekit.features.items.system.PreventXposedDetection { *; }
+-keep class com.ziymmx.wekit.features.items.system.SpoofEnvironment { *; }
+-keep class com.ziymmx.wekit.features.items.system.HideModuleFromAppList { *; }
+-keep class com.ziymmx.wekit.features.items.system.DisableHostHotUpdates { *; }
+-keep class com.ziymmx.wekit.features.items.system.ForceTabletMode { *; }
 
--keep class com.Johnny.wcx.features.api.core.WeXmlParserApi { *; }
--keep class com.Johnny.wcx.features.api.core.WeDatabaseApi { *; }
--keep class com.Johnny.wcx.features.api.core.WeMessageApi { *; }
--keep class com.Johnny.wcx.features.api.net.WeNetSceneApi { *; }
+-keep class com.ziymmx.wekit.features.api.core.WeXmlParserApi { *; }
+-keep class com.ziymmx.wekit.features.api.core.WeDatabaseApi { *; }
+-keep class com.ziymmx.wekit.features.api.core.WeMessageApi { *; }
+-keep class com.ziymmx.wekit.features.api.net.WeNetSceneApi { *; }
 
--keep,allowobfuscation class com.Johnny.wcx.hooks.** { *; }
--keep,allowobfuscation class com.Johnny.wcx.datas.** { *; }
+-keep,allowobfuscation class com.ziymmx.wekit.hooks.** { *; }
+-keep,allowobfuscation class com.ziymmx.wekit.datas.** { *; }
 
 # Keep annotation-annotated members (used by compile-time processors)
 -keepclassmembers,allowobfuscation class * {
-    @com.Johnny.wcx.annotations.* *;
+    @com.ziymmx.wekit.annotations.* *;
 }
 
 # ─── Kotlin ────────────────────────────────────────────────────────
@@ -57,11 +57,11 @@
 -keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.Johnny.wcx.**$$serializer { *; }
--keepclassmembers class com.Johnny.wcx.** {
+-keep,includedescriptorclasses class com.ziymmx.wekit.**$$serializer { *; }
+-keepclassmembers class com.ziymmx.wekit.** {
     *** Companion;
 }
--keepclasseswithmembers class com.Johnny.wcx.** {
+-keepclasseswithmembers class com.ziymmx.wekit.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

@@ -405,7 +405,7 @@ pub unsafe fn register_hook_bridge_natives(env: *mut RawJNIEnv, class_loader: jo
     let class = load_class_from_loader(
         env,
         class_loader,
-        "com.Johnny.wcx.loader.entry.zygisk.ArtHookBridge",
+        "com.ziymmx.wekit.loader.entry.zygisk.ArtHookBridge",
     );
     if class.is_null() {
         loge!("Zygisk: failed to load ArtHookBridge class");
@@ -466,7 +466,7 @@ pub unsafe fn register_entry_natives(env: *mut RawJNIEnv, class_loader: jobject)
     let class = load_class_from_loader(
         env,
         class_loader,
-        "com.Johnny.wcx.loader.entry.zygisk.ZygiskEntry",
+        "com.ziymmx.wekit.loader.entry.zygisk.ZygiskEntry",
     );
     if class.is_null() {
         loge!("Zygisk: failed to load ZygiskEntry class");

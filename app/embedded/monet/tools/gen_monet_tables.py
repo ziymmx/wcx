@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generate app/embedded/monet/monet_tables.json for the Monet overlay feature
-(com.Johnny.wcx.features.items.beautify.monet).
+(com.ziymmx.wekit.features.items.beautify.monet).
 
 ## What this produces
 A JSON with three sections consumed by MonetOverlayBuilder / MonetTables:

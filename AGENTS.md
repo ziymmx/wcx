@@ -32,7 +32,7 @@
 
 ## Entry Points & Architecture
 
-- Xposed entry: `com.Johnny.wcx.loader.entry.lsp10x.Lsp10xUnifiedHookEntry` (libxposed 101 & 100) and legacy Xposed API (51+) entry: `com.Johnny.wcx.loader.entry.xp51.Xp51HookEntry`
+- Xposed entry: `com.ziymmx.wekit.loader.entry.lsp10x.Lsp10xUnifiedHookEntry` (libxposed 101 & 100) and legacy Xposed API (51+) entry: `com.ziymmx.wekit.loader.entry.xp51.Xp51HookEntry`
 - Unified flow: `UnifiedEntryPoint.entry()` → `StartupAgent.startup()` → `WeLauncher.init()`
 - Hook items annotated with `@Feature(path, description)`, auto-discovered by KSP annotation scanner at compile time
 - Base classes: `SwitchFeature` (toggle on/off), `ClickableFeature` (toggle on/off with onClick event), `ApiFeature` (always-on), `BaseFeature` (abstract base, do not use directly)
@@ -60,7 +60,7 @@ restores the full upstream feature set.
 - Deleting feature files is NOT the way to trim this project — the API layer has
   dense cross-dependencies. Filter instead.
 - **`app/proguard-rules.pro` must stay in sync with the whitelist.** Upstream had a
-  blanket `-keep class com.Johnny.wcx.features.** { *; }` which keeps every feature
+  blanket `-keep class com.ziymmx.wekit.features.** { *; }` which keeps every feature
   class regardless of reachability, so R8 stripped nothing and the whitelist had no
   effect on APK size. The rule is now an explicit per-class list; when you add a
   feature to `features.whitelist`, add a matching `-keep` line or it may be
@@ -74,7 +74,7 @@ restores the full upstream feature set.
 
 ## Key Conventions
 
-- Package namespace: `com.Johnny.wcx`
+- Package namespace: `com.ziymmx.wekit`
 - Min SDK 29, target SDK 37, compile SDK 37
 - Target: WeChat `com.tencent.mm`, versions 8.0.65–8.0.71. Version info in `HostInfo`
 - Process targeting via `TargetProcesses`: override `startup()` to check

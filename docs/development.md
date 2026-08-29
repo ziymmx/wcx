@@ -73,5 +73,5 @@ cargo xtask run --release --flavor standard
 cargo xtask run --release --flavor legacy
 
 # 可选: 应用基准配置 (Baseline Profile)
-adb shell cmd package compile -m speed-profile com.Johnny.wcx
+adb shell cmd package compile -m speed-profile com.ziymmx.wekit
 ```
