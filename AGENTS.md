@@ -8,7 +8,9 @@
 # (./x is alias to `cargo xtask` which orchestrates the build process)
 ```
 
-- JDK 17 (from `gradle/libs.versions.toml`; the wrapper is Gradle 9.6.1, AGP 9.3.0)
+- JDK 21. `gradle/libs.versions.toml` says 17 and that is what app/reflekt/stubs
+  compile against, but `libs/common/bsh` hardcodes `JavaVersion.VERSION_21`, so the
+  build needs a JDK 21 toolchain. (Wrapper is Gradle 9.6.1, AGP 9.3.0.)
 - Rust native lib auto-compiles during build (targets: `app/src/main/rust/wekit-native`). Requires:
   Note: the CI workflow does **not** build it — `app/src/main/jniLibs/arm64-v8a/libwekit_native.so`
   is committed, so CI skips the whole Rust/NDK setup. Only re-run `cargo xtask build --native-only`
